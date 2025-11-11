@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <uchar.h>
 
 #define MAX_FILE_SIZE   5000000 // Maximum RSS feed page size is 5MB
 #define CHUNK_SIZE      4096
