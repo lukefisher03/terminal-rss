@@ -6,5 +6,11 @@ LDFLAGS += $(shell pkg-config --libs libssl libcrypto)
 socket_test: socket_test.c
 	${CLANG} ${CFLAGS} socket_test.c ${LDFLAGS} -o main
 
-xml_tree: xml_tree.c
-	${CLANG} -o main xml_tree.c
+run_socket_test: socket_test
+	./main
+
+xml_tree: xml_tree.c utils.c utils.h
+	${CLANG} -o main xml_tree.c utils.c
+
+run_xml_tree: xml_tree
+	./main
