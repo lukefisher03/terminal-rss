@@ -1,4 +1,4 @@
-CLANG = clang -std=c99 -O0 -g
+CLANG = clang -std=gnu11 -O0 -g
 
 CFLAGS += $(shell pkg-config --cflags openssl)
 LDFLAGS += $(shell pkg-config --libs libssl libcrypto)

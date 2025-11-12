@@ -1,11 +1,11 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <arpa/inet.h>
-#include <netdb.h>
 #include <openssl/types.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <netdb.h>
 
 struct SSL_CONNECTION {
     SSL_CTX  *ctx; // SSL context
