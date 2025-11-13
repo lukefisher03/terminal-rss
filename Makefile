@@ -9,8 +9,8 @@ socket_test: socket_test.c
 run_socket_test: socket_test
 	./main
 
-xml_tree: xml_tree.c utils.c utils.h
-	${CLANG} -o main xml_tree.c utils.c
+xml_tree: xml_tree.c utils.c utils.h rss_xml_tag.h rss_xml_tag.c
+	${CLANG} -o main xml_tree.c utils.c rss_xml_tag.c
 
 run_xml_tree: xml_tree
 	./main

@@ -7,13 +7,13 @@
 #include <unistd.h>
 #include <netdb.h>
 
-struct SSL_CONNECTION {
+struct  ssl_connection {
     SSL_CTX  *ctx; // SSL context
     SSL      *ssl; // SSL object
     int       sfd; // Attached file descriptor
 };
 
-struct SSL_CONNECTION *_ssl_connect(struct addrinfo *results, const char *host) {
+struct ssl_connection *_ssl_connect(struct addrinfo *results, const char *host) {
     struct addrinfo *result_pointer = results; // Hold the results from getaddrinfo
     int socket_file_descriptor; // Socket file descriptor
 
@@ -52,7 +52,7 @@ struct SSL_CONNECTION *_ssl_connect(struct addrinfo *results, const char *host) 
         return NULL;
     }
 
-    struct SSL_CONNECTION *ssl_items = (struct SSL_CONNECTION *)malloc(sizeof(struct SSL_CONNECTION));
+    struct ssl_connection *ssl_items = (struct ssl_connection *)malloc(sizeof(struct ssl_connection));
     
     if (!ssl_items) {
         printf("Failed to allocate SSL connection struct!\n");
@@ -66,7 +66,7 @@ struct SSL_CONNECTION *_ssl_connect(struct addrinfo *results, const char *host) 
     return ssl_items;
 }
 
-char * request_rss_xml(struct SSL_CONNECTION *ssl_items, const char * host, const char * path) {
+char * request_rss_xml(struct ssl_connection *ssl_items, const char * host, const char * path) {
     size_t bytes_read = 0;
     size_t cap = 64000;
 
@@ -100,7 +100,7 @@ char * request_rss_xml(struct SSL_CONNECTION *ssl_items, const char * host, cons
         }
         bytes_read += bytes;
         if (bytes_read >= cap - 1) {
-            cap *= 2;
+            cap *= 2; // Amortized O(1) append
             char *tmp = (char *)realloc(response, cap);
             if (tmp) {
                 response = tmp;
@@ -141,7 +141,7 @@ char * get_feed_xml(const char *host, const char *path) {
         return NULL;
     }
 
-    struct SSL_CONNECTION *ssl = _ssl_connect(results, host);
+    struct ssl_connection *ssl = _ssl_connect(results, host);
     freeaddrinfo(results);
     char * rss = request_rss_xml(ssl, host, path);
    
