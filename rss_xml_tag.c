@@ -6,7 +6,7 @@ struct rss_xml_tag *build_rss_xml_tag(char *tag_str, size_t length) {
         return NULL;
     }
 
-    size_t offset = 0;
+    size_t offset = 1;
     size_t index = 0;
     size_t end_i = 1; 
     size_t attribute_count = 0;
@@ -23,21 +23,22 @@ struct rss_xml_tag *build_rss_xml_tag(char *tag_str, size_t length) {
     t->attrs = NULL;
 
     // Determine the tag type first.
-    if (tag_str[0] == '/') {
+    if (tag_str[1] == '/') {
         t->type = TAG_CLOSE;
-        offset = 1; // Don't want to include the backslash in the tag name.
-    } else if (tag_str[length - 1] == '/') {
+        offset = 2; // Don't include the backslash in the tag name.
+    } else if (tag_str[length - 2] == '/') {
         t->type = TAG_SELF_CLOSE;
-    } else if (tag_str[0] == '?') {
+        length -= 2; // Don't include trailing backslash.
+    } else if (tag_str[1] == '?') {
         t->type = TAG_IGNORE;
-        offset = 1; // Don't want to include the backslash in the tage name.
+        offset = 2; // Don't include the backslash in the tage name.
     } else {
         t->type = TAG_OPEN;
     }
 
     // Determine the name portion of the tag.
     // No support for namespaces, so part after the colon is ignored in -> <tagName:secondPart>
-    for (index = 0; index < length && tag_str[index] != ' '; index++) {
+    for (index = 0; index < length && tag_str[index] != ' ' && tag_str[index] != '>'; index++) {
         if (tag_str[index] == ':') {
             colon_detected = true;
         }
@@ -100,7 +101,7 @@ int _parse_tag_attrs(struct rss_xml_tag *t, char *tag_str, size_t length) {
     for (; index < length; index++) {
         // Search for the beginning of an attribute. Skip these characters since they'll never
         // be the first character of an attribute.
-        if (tag_str[index] == ' ' || tag_str[index] == '?' || tag_str[index] == '/') continue; 
+        if (tag_str[index] == ' ' || tag_str[index] == '?' || tag_str[index] == '/' || tag_str[index] == '>') continue; 
         else {
             // Attribute found
             size_t start = index;
@@ -133,8 +134,8 @@ int _parse_tag_attrs(struct rss_xml_tag *t, char *tag_str, size_t length) {
     }
     
     if (attribute_count != t->attr_count) {
-        fprintf(stderr, "INVALID XML: %s\n", tag_str);
-        abort();
+        // Something went wrong
+        fprintf(stderr, "Could not parse XML tag: %s\n", tag_str);
     }
 
     return attribute_count;

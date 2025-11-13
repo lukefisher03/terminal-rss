@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "rss_xml_tag.h"
 
@@ -37,28 +38,15 @@ struct rss_feed *build_feed(char *xml, size_t size) {
     while (i < size) {
         char c = xml[i];
         if (c == '<') {
-            char tag[MAX_TAG_SIZE]; // The tag name shouldn't exceed 128 characters.
+            size_t tag_start = i;
+            size_t tag_length = 0;
 
-            size_t tag_len = 0;
-
-            bool reached_delimiter = false; // A boolean flag to make sure we stop storing the tag name.
-
-            size_t j;
-            for (j = i + 1; tag_len < MAX_TAG_SIZE && xml[j] != '>'; j++) {
-                if (j >= size - 2) {
-                    printf("No more characters! Invalid RSS!\n");
-                    break;
-                }
-                
-                tag[tag_len++] = xml[j];
-            }
-            
-            tag[tag_len] = '\0';
-            if (!tag_len) {
-                continue;
-            }
-            printf("Raw Tag: %s\n", tag);
-            struct rss_xml_tag *t = build_rss_xml_tag(tag, tag_len);
+            for (; xml[tag_start + tag_length] != '>'; tag_length++);
+            tag_length++;
+            char *tag_str = strndup(xml + tag_start, tag_length);
+            printf("Raw tag: %s\n", tag_str);
+            struct rss_xml_tag *t = build_rss_xml_tag(tag_str, tag_length);
+            free(tag_str);
             print_rss_xml_tag(t);
         }
         i++;
@@ -72,7 +60,7 @@ struct rss_feed *build_feed(char *xml, size_t size) {
 
 int main(int argc, char *argv[]) {
     size_t size;
-    char *rss = file_to_string("test.xml", &size);
+    char *rss = file_to_string("stack_overflow.xml", &size);
     struct rss_feed *feed = build_feed(rss, size);
     printf("Feed article count: %i\n", feed->article_count);
     free(rss);

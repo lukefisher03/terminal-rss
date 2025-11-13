@@ -189,7 +189,7 @@ void print_returned_addresses(struct addrinfo *results, FILE *stream) {
 
 
 int main(int argc, char const *argv[]) {
-    const char * xml = get_feed_xml("feeds.simplecast.com", "/hNaFxXpO");
+    const char * xml = get_feed_xml("stackoverflow.blog", "/feed/");
     printf("%s\n", xml);
     return 0;
 }
