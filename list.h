@@ -1,0 +1,27 @@
+#ifndef D_ARRAY
+#define D_ARRAY
+
+#include <stdbool.h>
+#include <stdlib.h>
+
+struct list {
+    size_t capacity;
+    size_t count;
+    void **elements;
+};
+
+struct list *list_init(void);
+
+bool list_append(struct list *stk, void *item);
+
+bool list_is_empty(struct list *stk);
+
+void *list_pop(struct list *stk);
+
+void *list_peek(struct list *stk);
+
+void list_clear(struct list *stk);
+
+void list_free(struct list *stk);
+
+#endif

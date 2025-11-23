@@ -1,174 +1,111 @@
 #include "xml_rss.h"
-#include "stack.h"
+#include "list.h"
 #include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 
-struct rss_feed *build_feed(char *xml, size_t size) {
-    /* Build an RSS feed of articles */
-    struct rss_feed *feed = rss_feed_init(); // Initialize our feed object
-    struct article *current_article = article_init(); // This object will get reused to add new articles
+struct xml_node *construct_tree(char *xml, size_t length) {
+    // Go through and detect closing and opening tags.
 
-    struct dynamic_stack *e_stack = stack_init(); // Element stack to keep track of what elements to add next
+    struct xml_node *root = xml_node_init();
+    struct list *stack = list_init();
+    list_append(stack, root);
+
+    size_t last_element_start = 0;
 
     size_t i = 0;
-    bool cdata_mode = false;
+    while (i < length) {
+        char *s = xml + i;
+        size_t l = length - i;
+        if (prefixcmp("<", s, l) && !prefixcmp("<!", s, l) && !prefixcmp("<?", s, l)) {
+            struct tag *new_tag = read_tag(s, l);
+            if (new_tag) {
+                if (new_tag->tag_type == TAG_OPEN) {
+                    struct xml_node *node = xml_node_init();
+                    node->name = strndup(new_tag->name, strlen(new_tag->name));
+                    struct xml_node *top = list_peek(stack);
+                    list_append(top->children, node);
+                    list_append(stack, node);
+                    last_element_start = i+new_tag->total_length;
 
-    while (i < size) {
-        if (prefixcmp("]]>", xml + i, size - i) && cdata_mode) {
-            /* HANDLE CLOSING CDATA*/
-            cdata_mode = false;
-            i++;
-        } else if (prefixcmp("<?", xml + i, size - i) || prefixcmp("<!-", xml + i, size - i)) {
-            // Skip comments and random metadata
-            ssize_t v = skip_tag(xml + i, size - i); 
+                } else if (new_tag->tag_type == TAG_CLOSE) {
+                    
+                    struct xml_node *v = list_pop(stack); // Pop off the stack
+                    // Need to fix how I'm doing this lol.
+                    v->text_content = strndup(xml + last_element_start + 1, i - last_element_start - 1);
+                    
+                }
 
-            if (v > 0) {
-                i += v;
-            } else {
-                fprintf(stderr, "ERROR: No closing `>` for tag at position %lu\n", i);
-                break;
-            }
-
-        } else if (prefixcmp("<![CDATA", xml + i, size - i) && !cdata_mode) {
-            cdata_mode = true;
-        } else if (prefixcmp("<", xml + i, size - i) && !cdata_mode) {
-            // Found new tag
-            struct tag *new_tag = malloc(sizeof(struct tag));
-            if (!new_tag) {
-                fprintf(stderr, "Memory allocation error!\n");
-                break;
-            }
-        
-            size_t count;
-            if ((count = parse_tag(xml + i, size - i, new_tag)) <= 0) {
-                fprintf(stderr, "Error parsing tag at position %lu\n", i);
-                break;
-            }
-
-            i += count + 1;
-
-            if (!decode_tag(new_tag, e_stack)) {
-                fprintf(stderr, "Could not decode tag: %s, skipping\n", new_tag->name);
+                i += new_tag->total_length;
+                free(new_tag->name);
+                free(new_tag);
             }
         } else {
-            // ACCUMULATE TEXT BETWEEN
-            printf("%c", xml[i]);
             i++;
         }
     }
 
-    // Free the element stack.
-    for (size_t i = 0; i < e_stack->count; i++) {
-        free_tag((struct tag*)e_stack->elements[i]);
-    }
-    stack_free(e_stack);
+    dfs(root);
+    printf("Stack count: %lu\n", stack->count);
     return NULL;
 }
 
-ssize_t skip_tag(char *s, size_t length) {
-    /* Return the number of characters until the first `>` character. */
-    for (size_t i = 1; i < length; i++) {
-        if (s[i] == '<') {
-            return -1;
-        }
-        if (s[i] == '>') {
-            return i+1;
-        }
+void dfs(struct xml_node *root) {
+    printf("Node: %s\n", root->name);
+    printf("Text content: %s\n", root->text_content);
+    printf("Children count: %lu\n", root->children->count);
+
+    for (size_t i = 0; i < root->children->count; i++) {
+        dfs(root->children->elements[i]);
     }
-    // Return -1 if there is no tag termination character.
-    return -1;
 }
 
-ssize_t parse_tag(char *s, size_t length, struct tag *new_tag) {
-    if (length <= 0) return -1; 
-    if (s[0] != '<') return -1; // Tags must begin with `<`
-
-    ssize_t i = 1;
-    new_tag->type = TAG_OPEN;
-
-    if (s[i] == '/') {
-        new_tag->type = TAG_CLOSE;
+struct tag *read_tag(char *str, size_t length) {
+    struct tag *new_tag = tag_init();
+    if (!new_tag) return NULL;
+    
+    size_t i = 1;
+    if (str[i] == '/') {
         i++;
     }
-    
-    ssize_t name_start = i;
-    for (; s[i] != ' ' && s[i] != '>' && s[i] != '/' && s[i] != ':'; i++);
-    if (i - name_start > 256) {
-        // TODO: Make this a toggleable setting for max tag length
-        printf("Encountered abnormally long tag name... proceeding forward anyways.");
+    size_t offset = i;
+    for (; i < length && !is_termination_char(str[i]); i++);
+    new_tag->name = strndup(str+offset, i-offset);
+    for (; i < length && str[i] != '>'; i++);
+
+    if (i >= length) return NULL;
+
+    if (str[1] == '/') {
+        new_tag->tag_type = TAG_CLOSE;
+    } else if (str[i - 1] == '/') {
+        new_tag->tag_type = TAG_SELF_CLOSE;
+    } else {
+        new_tag->tag_type = TAG_OPEN;
     }
 
-    new_tag->name = strndup(s + name_start, i - name_start);
+    new_tag->total_length = i;
+    return new_tag;
+}
 
-    for (; s[i] != '>'; i++);
-
-    if (s[i-1] == '/') {
-        new_tag->type = TAG_SELF_CLOSE;
+bool is_termination_char(char c) {
+    if (c == ' ' || c == ':' || c == '/' || c == '>') {
+        return true;
     }
-
-    return i;
+    return false;
 }
 
-bool decode_tag(struct tag *new_tag, struct dynamic_stack *stack) {
-    switch (new_tag->type) {
-        case TAG_OPEN:
-            stack_push(stack, new_tag);
-            break;
-        case TAG_CLOSE: {
-            struct tag *top_tag = stack_pop(stack);
-            // printf("Popped off: %s\n", top_tag_name);
-            if (strcmp(new_tag->name, top_tag->name) != 0) {
-                fprintf(stderr, "Found closing tag doesn't match opening tag!\nExpected: </%s>\nGot: </%s>\n", top_tag->name, new_tag->name);
-                return NULL;
-            }
-            break;
-        }
-        case TAG_SELF_CLOSE: break;
-        default:
-            return false;
-    }
-
-    return true;
+struct tag *tag_init() {
+    struct tag *new_tag = malloc(sizeof(struct tag));
+    return new_tag ? new_tag : NULL;
 }
 
-void free_tag(struct tag *t) {
-    if (!t) return;
-    free(t->name);
-    free(t);
-}
-
-struct rss_feed *rss_feed_init(void) {
-    struct rss_feed *feed = calloc(1, sizeof(struct rss_feed));
-
-    if (!feed) {
+struct xml_node *xml_node_init() {
+    struct xml_node *new_node = calloc(1, sizeof(struct xml_node));
+    if (!new_node) {
         return NULL;
     }
-
-    feed->articles = stack_init();
-
-    if (!feed->articles) {
-        free(feed);
-        return NULL;
-    }
-
-    return feed;
-
-}
-
-struct article *article_init(void) {
-    struct article *art = calloc(1, sizeof(struct article));
-
-    if (!art) {
-        return NULL;
-    }
-
-    art->title = NULL;
-    art->description = NULL;
-    art->author = NULL;
-    art->guid = NULL;
-    art->text_content = NULL;
-    return art;
+    new_node->children = list_init();
+    return new_node;
 }
