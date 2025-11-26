@@ -52,7 +52,7 @@ struct ssl_connection *_ssl_connect(struct addrinfo *results, const char *host) 
         return NULL;
     }
 
-    struct ssl_connection *ssl_items = (struct ssl_connection *)malloc(sizeof(struct ssl_connection));
+    struct ssl_connection *ssl_items = malloc(sizeof(*ssl_items));
     
     if (!ssl_items) {
         printf("Failed to allocate SSL connection struct!\n");

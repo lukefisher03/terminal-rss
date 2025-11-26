@@ -9,8 +9,8 @@ socket_test: socket_test.c
 run_socket_test: socket_test
 	./main
 
-main: main.c utils.c utils.h xml_rss.h xml_rss.c list.h list.c 
-	${CLANG} -o main main.c utils.c xml_rss.c list.c 
+main: main.c utils.c utils.h xml_rss.h xml_rss.c list.h list.c dynamic_string.h dynamic_string.c node.h node.c
+	${CLANG} -o main main.c utils.c xml_rss.c list.c dynamic_string.c node.c
 
 run_main: main
 	./main

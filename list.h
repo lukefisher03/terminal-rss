@@ -1,5 +1,5 @@
-#ifndef D_ARRAY
-#define D_ARRAY
+#ifndef LIST_H
+#define LIST_H
 
 #include <stdbool.h>
 #include <stdlib.h>

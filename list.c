@@ -5,7 +5,7 @@
 #define DEFAULT_CAPACITY 4
 
 struct list *list_init(void) {
-    struct list *l = malloc(sizeof(struct list));
+    struct list *l = malloc(sizeof(*l));
     if (!l) {
         return NULL;
     }

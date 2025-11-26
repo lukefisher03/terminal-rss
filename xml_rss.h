@@ -2,16 +2,12 @@
 #define XML_RSS_H
 
 #include "list.h"
+#include "node.h"
+#include "dynamic_string.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
-struct xml_node {
-    struct list *children; // Number of children.
-    char *name;            // Name of the element.
-    char *text_content;    // The text content it contains.
-};
 
 enum TAG_TYPE {
     TAG_OPEN,
@@ -21,21 +17,30 @@ enum TAG_TYPE {
 
 struct tag {
     char            *name;
-    enum TAG_TYPE   tag_type;   // True is opening, false is closing.
-                                // We ignore self-closing tags.
+    enum TAG_TYPE   tag_type;
     size_t          total_length;
 };
 
-struct xml_node *construct_tree(char *xml, size_t length);
+struct item {
 
-struct tag *read_tag(char *str, size_t length);
+};
+
+struct channel {
+    struct item item;
+
+};
+
+
+struct node *construct_parse_tree(char *xml, size_t length);
+
+bool read_tag(char *str, size_t length, struct tag *t);
+
+ssize_t accumulate_text(char *str, size_t length, struct node *new_node);
 
 bool is_termination_char(char c);
 
 struct tag *tag_init();
 
-struct xml_node *xml_node_init();
-
-void dfs(struct xml_node *root);
-
+void print_parse_tree(struct node *root, int depth);
+char * get_spacer(int width);
 #endif
