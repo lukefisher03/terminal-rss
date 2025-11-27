@@ -10,10 +10,10 @@ struct ds { // The name `ds` stands for dynamic string
     size_t  length;
 };
 
-struct ds *string_d_init(const char * s);
-struct ds *string_d_clone(const struct ds *s);
-struct ds *string_d_append(struct ds *s1, const char *s2);
-void string_d_reset(struct ds *s);
-void string_d_free(struct ds *s);
+struct ds *ds_init(const char * s);
+struct ds *ds_clone(const struct ds *s);
+struct ds *ds_append(struct ds *s1, const char *s2);
+void ds_reset(struct ds *s);
+void ds_free(struct ds *s);
 
 #endif

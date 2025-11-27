@@ -27,6 +27,7 @@ struct item {
     char    *pub_date;
     char    *description;
     char    *link;
+    char    *guid;
 };
 
 struct channel {
@@ -34,23 +35,30 @@ struct channel {
     char            *description;
     char            *link;
     char            *last_build_date;
-    struct item     **items;
+    char            *language;
+    struct list     *items; // List of items
 };
 
+enum CONTAINER_TYPE {
+    CHANNEL,
+    ITEM,
+    // IMG, // Not going to worry about this for now. TODO: Add image support
+};
 
-struct node *construct_parse_tree(char *xml, size_t length);
+struct container {
+    enum CONTAINER_TYPE     type;
+    union {
+        struct item     *item;
+        struct channel  *channel;
+    };
+};
 
-void print_parse_tree(struct node *root, int depth);
+struct node *construct_parse_tree(const char *xml, size_t length);
 
-bool read_tag(char *str, size_t length, struct tag *t);
-
-ssize_t accumulate_text(char *str, size_t length, struct node *new_node);
-
-bool is_termination_char(char c);
-
-struct tag *tag_init();
+void print_parse_tree(const struct node *root, int depth);
 
 bool build_channel(struct channel *chan, struct node *parse_tree);
 
-char * get_spacer(int width);
+struct channel *channel_init();
+struct item *item_init();
 #endif

@@ -5,7 +5,7 @@
 
 #define DEFAULT_BUFFER_SIZE 16
 
-struct ds *string_d_init(const char * s) {
+struct ds *ds_init(const char * s) {
     struct ds *new_s = malloc(sizeof(*new_s));
     
     if (!new_s) {
@@ -25,9 +25,9 @@ struct ds *string_d_init(const char * s) {
     return new_s;
 }
 
-struct ds *string_d_clone(const struct ds *s) {
+struct ds *ds_clone(const struct ds *s) {
     if (!s) {
-        return string_d_init("");
+        return ds_init("");
     }
 
     struct ds *new_s = malloc(sizeof(*new_s));
@@ -49,7 +49,7 @@ struct ds *string_d_clone(const struct ds *s) {
     return new_s;
 }
 
-void string_d_reset(struct ds *s) {
+void ds_reset(struct ds *s) {
     if (!s) return;
     free(s->str);
     s->str = malloc(DEFAULT_BUFFER_SIZE);
@@ -61,7 +61,7 @@ void string_d_reset(struct ds *s) {
 }
 
 
-struct ds *string_d_append(struct ds *s1, const char *s2) {
+struct ds *ds_append(struct ds *s1, const char *s2) {
     size_t length = strlen(s2);
 
     bool needs_extension = false;
@@ -84,7 +84,7 @@ struct ds *string_d_append(struct ds *s1, const char *s2) {
     return s1;
 }
 
-void string_d_free(struct ds *s) {
+void ds_free(struct ds *s) {
     free(s->str);
     free(s);
 }

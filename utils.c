@@ -15,7 +15,7 @@ char *file_to_string(const char *path, size_t *size) {
     size_t capacity = 100000; // 100KB base size
     size_t buf_sz = 0; 
 
-    str = (char *)malloc(capacity);
+    str = malloc(capacity);
     if (!str) {
         fprintf(stderr, "Could not allocate space to hold file %s\n", path);
         fclose(fptr);
@@ -68,7 +68,7 @@ char *file_to_string(const char *path, size_t *size) {
     return str;
 }
 
-bool prefixcmp(const char *prefix, char *str, size_t str_length) {
+bool sstartswith(const char *prefix, const char *str, size_t str_length) {
     /*  Prefix compare - Given some prefix and a string to compare it against, 
         check if the string starts with the prefix  */
 
@@ -84,7 +84,7 @@ bool prefixcmp(const char *prefix, char *str, size_t str_length) {
     return true;
 }
 
-bool prefixcmp_fast(const char *prefix, size_t prefix_length, char *str, size_t str_length) {
+bool sstartswith_fast(const char *prefix, size_t prefix_length, const char *str, size_t str_length) {
     /* Prefix compare fast - Same as prefix compare, except with no calls to O(n) strlen. 
        Use for comparing larger strings where the cost of O(n) is too high. */
 

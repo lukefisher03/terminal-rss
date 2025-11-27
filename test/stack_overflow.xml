@@ -11,8 +11,7 @@ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
 >
 <!--Hello thereeee-->
 <channel>
-   <tag  name="value" name2="v"></tag>
-   <title></title>
+    <title>Hello world</title>
    <description>Essays, opinions, and advice on the act of computer programming from Stack Overflow.</description>
    <atom:link href="https://stackoverflow.blog/feed/" rel="self" type="application/rss+xml" />
    <link>https://stackoverflow.blog/</link>
@@ -31,8 +30,7 @@ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
        <category>  <![CDATA[stack-overflow-for-teams]]></category>
    </item>
    <item>
-       This is text here!
-       <guid isPermaLink="false">0f3c2d30-<b>a821</b>-4240-9599-0c6b35321410</guid>
+       <guid isPermaLink="false">0f3c2d30-a821-4240-9599-0c6b35321410</guid>
        <title>AI code means more critical thinking, not less</title>
        <link>https://stackoverflow.blog/2025/11/11/ai-code-means-more-critical-thinking-not-less/</link>
        <pubDate>Tue, 11 Nov 2025 08:40:00 GMT</pubDate>

@@ -70,7 +70,7 @@ char * request_rss_xml(struct ssl_connection *ssl_items, const char * host, cons
     size_t bytes_read = 0;
     size_t cap = 64000;
 
-    char *response = (char *)malloc(cap);
+    char *response = malloc(cap);
     char request[1024];
 
     snprintf(request, sizeof(request), 
@@ -101,7 +101,7 @@ char * request_rss_xml(struct ssl_connection *ssl_items, const char * host, cons
         bytes_read += bytes;
         if (bytes_read >= cap - 1) {
             cap *= 2; // Amortized O(1) append
-            char *tmp = (char *)realloc(response, cap);
+            char *tmp = realloc(response, cap);
             if (tmp) {
                 response = tmp;
             } else {

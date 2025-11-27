@@ -32,9 +32,9 @@ bool list_append(struct list *l, void *item) {
     return true;
 }
 
-inline bool list_is_empty(struct list *l) { return l->count == 0; }
+inline bool list_is_empty(const struct list *l) { return l->count == 0; }
 
-void *list_peek(struct list *l) {
+void *list_peek(const struct list *l) {
     if (l->count == 0) {
         return NULL;
     }

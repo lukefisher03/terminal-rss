@@ -14,11 +14,11 @@ struct list *list_init(void);
 
 bool list_append(struct list *stk, void *item);
 
-bool list_is_empty(struct list *stk);
+bool list_is_empty(const struct list *stk);
 
 void *list_pop(struct list *stk);
 
-void *list_peek(struct list *stk);
+void *list_peek(const struct list *stk);
 
 void list_clear(struct list *stk);
 
