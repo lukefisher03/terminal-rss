@@ -1,7 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "dynamic_string.h"
 #include "list.h"
 
 enum NODE_TYPE {

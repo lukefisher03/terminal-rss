@@ -1,6 +1,5 @@
 #include "xml_rss.h"
 #include "utils.h"
-#include "dynamic_string.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,12 +9,14 @@
 #define TRSS_ERR -1
 
 // ======== Forward declarations ======== //
+
 static inline bool is_termination_char(char c);
 static char *get_spacer(int width);
 struct container *container_init(enum CONTAINER_TYPE t);
 void free_container(struct container *c);
 
 // ======== Build parse tree ======== //
+
 bool read_tag(const char *str, size_t length, struct tag *t) {
     // Given a string starting with `<`, extract the tag name and
     // return the length of the tag.
@@ -183,6 +184,7 @@ void print_parse_tree(const struct node *root, int depth) {
 }
 
 // ======== Build channels ======== //
+
 int process_node(struct container *c, const struct node *n) {
     // This function only expects XML nodes, not text or dummy nodes
     if (n->type != XML_NODE) return TRSS_ERR;
@@ -214,8 +216,6 @@ int process_node(struct container *c, const struct node *n) {
         struct channel *channel = c->channel;
         if (!strcmp(node_name, "title")) {
            channel->title = strdup(text_node->text);
-        } else if (!strcmp(node_name, "guid")) {
-           channel->description = strdup(text_node->text);
         } else if (!strcmp(node_name, "lastBuildDate")) {
            channel->last_build_date = strdup(text_node->text);
         } else if (!strcmp(node_name, "link")) {
@@ -234,7 +234,6 @@ int process_node(struct container *c, const struct node *n) {
 
     return TRSS_OK;
 }
-
 
 bool build_channel(struct channel *chan, struct node *root_node) {
     // Perform iterative DFS to build a channel from a parse tree
@@ -319,6 +318,7 @@ bool build_channel(struct channel *chan, struct node *root_node) {
 }
 
 // ======== Initializers ======== //
+
 struct item *item_init(void) {
     struct item *new_item = calloc(1, sizeof(*new_item));
     if (!new_item) {
@@ -359,6 +359,7 @@ struct container *container_init(enum CONTAINER_TYPE t) {
 }
 
 // ======== Utility functions ======== //
+
 static char *get_spacer(int width) {
     // Build spacer to properly indent printing a tree
 

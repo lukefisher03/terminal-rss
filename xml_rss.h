@@ -3,7 +3,6 @@
 
 #include "list.h"
 #include "node.h"
-#include "dynamic_string.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
