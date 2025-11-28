@@ -1,8 +1,8 @@
 #ifndef XML_RSS_H
 #define XML_RSS_H
 
-#include "list.h"
 #include "node.h"
+#include "../list.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

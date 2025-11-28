@@ -1,5 +1,5 @@
 #include "xml_rss.h"
-#include "utils.h"
+#include "../utils.h"
 
 #include <stdio.h>
 #include <string.h>

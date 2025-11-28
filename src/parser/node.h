@@ -1,7 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "list.h"
+#include "../list.h"
 
 enum NODE_TYPE {
     ROOT_NODE,

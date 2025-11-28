@@ -1,7 +1,9 @@
+#define TB_IMPL
+#include "../termbox2/termbox2.h"
 #include "utils.h"
-#include "xml_rss.h"
-#include "node.h"
 #include "list.h"
+#include "parser/xml_rss.h"
+#include "parser/node.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,4 +27,17 @@ int main(int argc, char *argv[]) {
     }
 
     free_channel(c);
+
+    // struct tb_event ev;
+    // int y = 0;
+
+    // tb_init();
+
+    // tb_printf(0, y++, TB_GREEN, 0, "hello from termbox");
+    // tb_present();
+
+    // tb_poll_event(&ev);
+    // tb_shutdown();
+
+    return 0;
 }
