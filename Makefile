@@ -16,11 +16,10 @@ main: src/main.c \
 	  src/utils.c \
 	  src/utils.h \
 	  src/list.h src/list.c \
-	  ${PARSER}/xml_rss.h \
-	  ${PARSER}/xml_rss.c \
-	  ${PARSER}/node.h \
-	  ${PARSER}/node.c
-	${CLANG} -o main src/main.c src/utils.c ${PARSER}/xml_rss.c src/list.c ${PARSER}/node.c
+	  src/ui.h src/ui.c \
+	  ${PARSER}/xml_rss.h ${PARSER}/xml_rss.c \
+	  ${PARSER}/node.h ${PARSER}/node.c
+	${CLANG} -o main src/main.c src/utils.c ${PARSER}/xml_rss.c src/list.c ${PARSER}/node.c src/ui.c
 
 run_main: main
 	./main
